@@ -5,8 +5,9 @@
       <map>
         <entry key="..\:/Users/fzela/AndroidStudioProjects/ToDoList/app/src/main/res/drawable/ic_add.xml" value="0.252" />
         <entry key="..\:/Users/fzela/AndroidStudioProjects/ToDoList/app/src/main/res/drawable/ic_priority.xml" value="0.252" />
-        <entry key="..\:/Users/fzela/AndroidStudioProjects/ToDoList/app/src/main/res/layout/fragment_add_edit_task.xml" value="0.5" />
-        <entry key="..\:/Users/fzela/AndroidStudioProjects/ToDoList/app/src/main/res/layout/fragment_tasks.xml" value="0.21" />
+        <entry key="..\:/Users/fzela/AndroidStudioProjects/ToDoList/app/src/main/res/layout/activity_main.xml" value="0.20222317229585293" />
+        <entry key="..\:/Users/fzela/AndroidStudioProjects/ToDoList/app/src/main/res/layout/fragment_add_edit_task.xml" value="0.25" />
+        <entry key="..\:/Users/fzela/AndroidStudioProjects/ToDoList/app/src/main/res/layout/fragment_tasks.xml" value="0.25" />
         <entry key="..\:/Users/fzela/AndroidStudioProjects/ToDoList/app/src/main/res/layout/item_task.xml" value="0.25" />
       </map>
     </option>
