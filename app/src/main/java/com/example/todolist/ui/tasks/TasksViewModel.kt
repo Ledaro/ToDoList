@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.savedstate.SavedStateRegistryOwner
 import com.example.todolist.data.TaskDao
 import dagger.assisted.Assisted
@@ -37,4 +38,6 @@ class TasksViewModel @AssistedInject constructor(
                 }
             }
     }
+
+    val tasks = taskDao.getTasks().asLiveData()
 }
