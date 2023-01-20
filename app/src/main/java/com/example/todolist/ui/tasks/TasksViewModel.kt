@@ -10,6 +10,9 @@ import com.example.todolist.data.TaskDao
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
 
 class TasksViewModel @AssistedInject constructor(
     private val taskDao: TaskDao,
@@ -39,5 +42,11 @@ class TasksViewModel @AssistedInject constructor(
             }
     }
 
-    val tasks = taskDao.getTasks().asLiveData()
+    val searchQuery = MutableStateFlow("")
+
+    private val tasksFlow = searchQuery.flatMapLatest {
+        taskDao.getTasks(it)
+    }
+
+    val tasks = tasksFlow.asLiveData()
 }
