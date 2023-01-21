@@ -11,12 +11,12 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 
 class TasksViewModel @AssistedInject constructor(
     private val taskDao: TaskDao,
-    @Assisted state:SavedStateHandle
+    @Assisted state: SavedStateHandle
 ) : ViewModel() {
 
     @AssistedFactory
@@ -42,11 +42,23 @@ class TasksViewModel @AssistedInject constructor(
             }
     }
 
+    val sortOrder = MutableStateFlow(SortOrder.BY_DATE)
+    val hideCompleted = MutableStateFlow(false)
+
     val searchQuery = MutableStateFlow("")
 
-    private val tasksFlow = searchQuery.flatMapLatest {
-        taskDao.getTasks(it)
+    private val tasksFlow = combine(
+        searchQuery,
+        sortOrder,
+        hideCompleted
+    ) { query, sortOrder, hideCompleted ->
+        Triple(query, sortOrder, hideCompleted)
     }
+        .flatMapLatest { (query, sortOrder, hideCompleted) ->
+            taskDao.getTasks(query, sortOrder, hideCompleted)
+        }
 
     val tasks = tasksFlow.asLiveData()
 }
+
+enum class SortOrder { BY_NAME, BY_DATE }
