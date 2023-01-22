@@ -1,11 +1,11 @@
 package com.example.todolist.ui.tasks
 
 import android.os.Bundle
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.*
 import androidx.savedstate.SavedStateRegistryOwner
+import com.example.todolist.data.PreferencesManager
+import com.example.todolist.data.SortOrder
+import com.example.todolist.data.Task
 import com.example.todolist.data.TaskDao
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -13,9 +13,11 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.launch
 
 class TasksViewModel @AssistedInject constructor(
     private val taskDao: TaskDao,
+    private val preferencesManager: PreferencesManager,
     @Assisted state: SavedStateHandle
 ) : ViewModel() {
 
@@ -42,23 +44,35 @@ class TasksViewModel @AssistedInject constructor(
             }
     }
 
-    val sortOrder = MutableStateFlow(SortOrder.BY_DATE)
-    val hideCompleted = MutableStateFlow(false)
+    val preferencesFlow = preferencesManager.preferencesFlow
 
     val searchQuery = MutableStateFlow("")
 
     private val tasksFlow = combine(
         searchQuery,
-        sortOrder,
-        hideCompleted
-    ) { query, sortOrder, hideCompleted ->
-        Triple(query, sortOrder, hideCompleted)
+        preferencesFlow
+    ) { query, filterPreferences ->
+        Pair(query, filterPreferences)
     }
-        .flatMapLatest { (query, sortOrder, hideCompleted) ->
-            taskDao.getTasks(query, sortOrder, hideCompleted)
+        .flatMapLatest { (query, filterPreferences) ->
+            taskDao.getTasks(query, filterPreferences.sortOrder, filterPreferences.hideCompleted)
         }
 
     val tasks = tasksFlow.asLiveData()
-}
 
-enum class SortOrder { BY_NAME, BY_DATE }
+    fun onSortOrderSelected(sortOrder: SortOrder) = viewModelScope.launch {
+        preferencesManager.updateSortOrder(sortOrder)
+    }
+
+    fun onHideCompletedSelected(hideCompleted: Boolean) = viewModelScope.launch {
+        preferencesManager.updateHideCompleted(hideCompleted)
+    }
+
+    fun onTaskSelected(task: Task) {
+
+    }
+
+    fun onTaskCheckedChange(task: Task, isChecked: Boolean) = viewModelScope.launch {
+        taskDao.update(task.copy(completed = isChecked))
+    }
+}
