@@ -3,6 +3,8 @@ package com.example.todolist.ui.tasks
 import android.os.Bundle
 import androidx.lifecycle.*
 import androidx.savedstate.SavedStateRegistryOwner
+import com.example.todolist.ADD_TASK_RESULT_OK
+import com.example.todolist.EDIT_TASK_RESULT_OK
 import com.example.todolist.data.PreferencesManager
 import com.example.todolist.data.SortOrder
 import com.example.todolist.data.Task
@@ -11,7 +13,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 class TasksViewModel @AssistedInject constructor(
     private val taskDao: TaskDao,
     private val preferencesManager: PreferencesManager,
-    @Assisted state: SavedStateHandle
+    @Assisted private val state: SavedStateHandle
 ) : ViewModel() {
 
     @AssistedFactory
@@ -46,15 +47,16 @@ class TasksViewModel @AssistedInject constructor(
             }
     }
 
+    val searchQuery = state.getLiveData("searchQuery", "")
+
     val preferencesFlow = preferencesManager.preferencesFlow
 
     private val taskEventChannel = Channel<TasksEvent>()
+
     val taskEvent = taskEventChannel.receiveAsFlow()
 
-    val searchQuery = MutableStateFlow("")
-
     private val tasksFlow = combine(
-        searchQuery,
+        searchQuery.asFlow(),
         preferencesFlow
     ) { query, filterPreferences ->
         Pair(query, filterPreferences)
@@ -73,8 +75,8 @@ class TasksViewModel @AssistedInject constructor(
         preferencesManager.updateHideCompleted(hideCompleted)
     }
 
-    fun onTaskSelected(task: Task) {
-
+    fun onTaskSelected(task: Task) = viewModelScope.launch {
+        taskEventChannel.send(TasksEvent.NavigateToEditTaskScreen(task))
     }
 
     fun onTaskCheckedChange(task: Task, isChecked: Boolean) = viewModelScope.launch {
@@ -90,7 +92,25 @@ class TasksViewModel @AssistedInject constructor(
         taskDao.insert(task)
     }
 
+    fun onAddNewTaskClick() = viewModelScope.launch {
+        taskEventChannel.send(TasksEvent.NavigateToAddTaskScreen)
+    }
+
+    fun onAddEditResult(result: Int){
+        when(result) {
+            ADD_TASK_RESULT_OK -> showTaskSavedConfirmationMessage("Task added")
+            EDIT_TASK_RESULT_OK -> showTaskSavedConfirmationMessage("Task updated")
+        }
+    }
+
+    private fun showTaskSavedConfirmationMessage(text: String) = viewModelScope.launch {
+        taskEventChannel.send(TasksEvent.ShowTaskSavedConfirmationMessage(text))
+    }
+
     sealed class TasksEvent {
+        object NavigateToAddTaskScreen : TasksEvent()
+        data class NavigateToEditTaskScreen(val task: Task) : TasksEvent()
         data class ShowUndoDeleteTaskMessage(val task: Task) : TasksEvent()
+        data class ShowTaskSavedConfirmationMessage(val msg: String) : TasksEvent()
     }
 }
