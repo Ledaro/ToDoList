@@ -1,6 +1,7 @@
 package com.example.todolist.ui.tasks
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -26,37 +27,34 @@ class TasksAdapter(private val listener: OnItemClickListener) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.apply {
-                root.setOnClickListener {
-                    val position = adapterPosition
-                    if (position != RecyclerView.NO_POSITION) {
-                        val task = getItem(position)
-                        listener.onItemClick(task)
-                    }
+            binding.root.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val task = getItem(position)
+                    listener.onItemClick(task, it)
                 }
+            }
 
-                checkboxCompleted.setOnClickListener {
-                    val position = adapterPosition
-                    if (position != RecyclerView.NO_POSITION) {
-                        val task = getItem(position)
-                        listener.onCheckBoxClick(task, checkboxCompleted.isChecked)
-                    }
+            binding.checkboxCompleted.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val task = getItem(position)
+                    listener.onCheckBoxClick(task, binding.checkboxCompleted.isChecked)
                 }
             }
         }
 
         fun bind(task: Task) {
-            binding.apply {
-                textViewTask.text = task.name
-                textViewTask.paint.isStrikeThruText = task.completed
-                checkboxCompleted.isChecked = task.completed
-                labelPriority.isVisible = task.important
-            }
+            binding.textViewTask.text = task.name
+            binding.textViewTask.paint.isStrikeThruText = task.completed
+            binding.checkboxCompleted.isChecked = task.completed
+            binding.labelPriority.isVisible = task.important
+            binding.root.transitionName = "task$adapterPosition"
         }
     }
 
     interface OnItemClickListener {
-        fun onItemClick(task: Task)
+        fun onItemClick(task: Task, taskView: View)
         fun onCheckBoxClick(task: Task, isChecked: Boolean)
     }
 

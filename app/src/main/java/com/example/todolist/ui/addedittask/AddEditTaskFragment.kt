@@ -1,5 +1,6 @@
 package com.example.todolist.ui.addedittask
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
@@ -13,7 +14,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.todolist.R
 import com.example.todolist.databinding.FragmentAddEditTaskBinding
 import com.example.todolist.util.exhaustive
+import com.example.todolist.util.themeColor
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -25,6 +28,17 @@ class AddEditTaskFragment : Fragment(R.layout.fragment_add_edit_task) {
 
     private val viewModel: AddEditTaskViewModel by viewModels {
         AddEditTaskViewModel.provideFactory(addEditTaskViewModelFactory, this, arguments)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        sharedElementEnterTransition = MaterialContainerTransform().apply {
+            drawingViewId = R.id.nav_host_fragment
+            duration = resources.getInteger(R.integer.motion_duration_large).toLong()
+            scrimColor = Color.TRANSPARENT
+            setAllContainerColors(requireContext().themeColor(com.google.android.material.R.attr.colorSurface))
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

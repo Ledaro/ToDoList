@@ -50,13 +50,13 @@ class AddEditTaskViewModel @AssistedInject constructor(
     var taskName = state.get<String>("taskName") ?: task?.name ?: ""
         set(value) {
             field = value
-            state.set("taskName", value)
+            state["taskName"] = value
         }
 
     var taskImportance = state.get<Boolean>("taskImportance") ?: task?.important ?: false
         set(value) {
             field = value
-            state.set("taskImportance", value)
+            state["taskImportance"] = value
         }
 
     private val addEditTaskEventChannel = Channel<AddEditTaskEvent>()

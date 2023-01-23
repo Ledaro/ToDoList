@@ -6,10 +6,12 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,6 +23,7 @@ import com.example.todolist.databinding.FragmentTasksBinding
 import com.example.todolist.util.exhaustive
 import com.example.todolist.util.onQueryTextChanged
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialElevationScale
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -100,12 +103,19 @@ class TaskFragment : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClick
 
                     }
                     is TasksViewModel.TasksEvent.NavigateToEditTaskScreen -> {
+                        val transitionDestination =
+                            requireContext().getString(R.string.task_transition_name)
+                        val extras = FragmentNavigatorExtras(
+                            event.taskView to transitionDestination,
+                        )
                         val action = TaskFragmentDirections.actionTaskFragmentToAddEditTaskFragment(
                             event.task,
                             "Edit Task"
                         )
-                        findNavController().navigate(action)
+                        findNavController().navigate(action, extras)
+                        setExitReenterTransition()
                     }
+
                     is TasksViewModel.TasksEvent.ShowTaskSavedConfirmationMessage -> {
 
                         Snackbar.make(requireView(), event.msg, Snackbar.LENGTH_SHORT).show()
@@ -118,11 +128,15 @@ class TaskFragment : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClick
                 }
             }.exhaustive
         }
+
+        postponeEnterTransition()
+        view.doOnPreDraw { startPostponedEnterTransition() }
+
         setHasOptionsMenu(true)
     }
 
-    override fun onItemClick(task: Task) {
-        viewModel.onTaskSelected(task)
+    override fun onItemClick(task: Task, taskView: View) {
+        viewModel.onTaskSelected(task, taskView)
     }
 
     override fun onCheckBoxClick(task: Task, isChecked: Boolean) {
@@ -171,6 +185,16 @@ class TaskFragment : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClick
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+
+    }
+
+    private fun setExitReenterTransition() {
+        exitTransition = MaterialElevationScale(false).apply {
+            duration = 300
+        }
+        reenterTransition = MaterialElevationScale(true).apply {
+            duration = 300
         }
     }
 

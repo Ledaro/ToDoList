@@ -1,6 +1,7 @@
 package com.example.todolist.ui.tasks
 
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.*
 import androidx.savedstate.SavedStateRegistryOwner
 import com.example.todolist.ADD_TASK_RESULT_OK
@@ -75,8 +76,8 @@ class TasksViewModel @AssistedInject constructor(
         preferencesManager.updateHideCompleted(hideCompleted)
     }
 
-    fun onTaskSelected(task: Task) = viewModelScope.launch {
-        taskEventChannel.send(TasksEvent.NavigateToEditTaskScreen(task))
+    fun onTaskSelected(task: Task, taskView: View) = viewModelScope.launch {
+        taskEventChannel.send(TasksEvent.NavigateToEditTaskScreen(task, taskView))
     }
 
     fun onTaskCheckedChange(task: Task, isChecked: Boolean) = viewModelScope.launch {
@@ -96,8 +97,8 @@ class TasksViewModel @AssistedInject constructor(
         taskEventChannel.send(TasksEvent.NavigateToAddTaskScreen)
     }
 
-    fun onAddEditResult(result: Int){
-        when(result) {
+    fun onAddEditResult(result: Int) {
+        when (result) {
             ADD_TASK_RESULT_OK -> showTaskSavedConfirmationMessage("Task added")
             EDIT_TASK_RESULT_OK -> showTaskSavedConfirmationMessage("Task updated")
         }
@@ -113,7 +114,7 @@ class TasksViewModel @AssistedInject constructor(
 
     sealed class TasksEvent {
         object NavigateToAddTaskScreen : TasksEvent()
-        data class NavigateToEditTaskScreen(val task: Task) : TasksEvent()
+        data class NavigateToEditTaskScreen(val task: Task, val taskView: View) : TasksEvent()
         data class ShowUndoDeleteTaskMessage(val task: Task) : TasksEvent()
         data class ShowTaskSavedConfirmationMessage(val msg: String) : TasksEvent()
         object NavigateToDeleteAllCompletedScreen : TasksEvent()
