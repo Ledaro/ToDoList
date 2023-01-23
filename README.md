@@ -41,5 +41,5 @@ git clone https://github.com/Ledaro/ToDoList.git
 This project is open to contributions. Feel free to submit pull requests with bug fixes or new features.
 
 #### What can be improved
--Add new Material Motion Animations
--Add Bottom App Bar
+- Add new Material Motion Animations
+- Add Bottom App Bar
