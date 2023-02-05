@@ -1,9 +1,7 @@
 package com.example.todolist.ui.tasks
 
-import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.*
-import androidx.savedstate.SavedStateRegistryOwner
 import com.example.todolist.ADD_TASK_RESULT_OK
 import com.example.todolist.EDIT_TASK_RESULT_OK
 import com.example.todolist.data.PreferencesManager
@@ -11,42 +9,20 @@ import com.example.todolist.data.SortOrder
 import com.example.todolist.data.Task
 import com.example.todolist.data.TaskDao
 import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TasksViewModel @AssistedInject constructor(
+@HiltViewModel
+class TasksViewModel @Inject constructor(
     private val taskDao: TaskDao,
     private val preferencesManager: PreferencesManager,
-    @Assisted private val state: SavedStateHandle
+    state: SavedStateHandle
 ) : ViewModel() {
-
-    @AssistedFactory
-    interface TasksViewModelFactory {
-        fun create(handle: SavedStateHandle): TasksViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: TasksViewModelFactory,
-            owner: SavedStateRegistryOwner,
-            defaultArgs: Bundle? = null,
-        ): AbstractSavedStateViewModelFactory =
-            object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(
-                    key: String,
-                    modelClass: Class<T>,
-                    handle: SavedStateHandle
-                ): T {
-                    return assistedFactory.create(handle) as T
-                }
-            }
-    }
 
     val searchQuery = state.getLiveData("searchQuery", "")
 

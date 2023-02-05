@@ -6,21 +6,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class DeleteAllCompletedDialogFragment : DialogFragment() {
 
-    @Inject
-    lateinit var deleteAllCompletedViewModelFactory: DeleteAllCompletedViewModel.DeleteAllCompletedViewModelFactory
-
-    private val viewModel: DeleteAllCompletedViewModel by viewModels {
-        DeleteAllCompletedViewModel.provideFactory(
-            deleteAllCompletedViewModelFactory,
-            this,
-            arguments
-        )
-    }
+    private val viewModel: DeleteAllCompletedViewModel by viewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
         AlertDialog.Builder(requireContext())

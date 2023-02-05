@@ -27,17 +27,11 @@ import com.google.android.material.transition.MaterialElevationScale
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class TaskFragment : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClickListener {
 
-    @Inject
-    lateinit var tasksViewModelFactory: TasksViewModel.TasksViewModelFactory
-
-    private val viewModel: TasksViewModel by viewModels {
-        TasksViewModel.provideFactory(tasksViewModelFactory, this, arguments)
-    }
+    private val viewModel: TasksViewModel by viewModels()
 
     private lateinit var searchView: SearchView
 

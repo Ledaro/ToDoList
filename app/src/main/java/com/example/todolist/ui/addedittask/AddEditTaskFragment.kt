@@ -18,17 +18,11 @@ import com.example.todolist.util.themeColor
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class AddEditTaskFragment : Fragment(R.layout.fragment_add_edit_task) {
 
-    @Inject
-    lateinit var addEditTaskViewModelFactory: AddEditTaskViewModel.AddEditTaskViewModelFactory
-
-    private val viewModel: AddEditTaskViewModel by viewModels {
-        AddEditTaskViewModel.provideFactory(addEditTaskViewModelFactory, this, arguments)
-    }
+    private val viewModel: AddEditTaskViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

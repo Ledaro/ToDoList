@@ -13,37 +13,17 @@ import com.example.todolist.data.TaskDao
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AddEditTaskViewModel @AssistedInject constructor(
+@HiltViewModel
+class AddEditTaskViewModel @Inject constructor(
     private val taskDao: TaskDao,
-    @Assisted private val state: SavedStateHandle
+    private val state: SavedStateHandle
 ) : ViewModel() {
-
-    @AssistedFactory
-    interface AddEditTaskViewModelFactory {
-        fun create(handle: SavedStateHandle): AddEditTaskViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: AddEditTaskViewModelFactory,
-            owner: SavedStateRegistryOwner,
-            defaultArgs: Bundle? = null,
-        ): AbstractSavedStateViewModelFactory =
-            object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(
-                    key: String,
-                    modelClass: Class<T>,
-                    handle: SavedStateHandle
-                ): T {
-                    return assistedFactory.create(handle) as T
-                }
-            }
-    }
 
     val task = state.get<Task>("task")
 

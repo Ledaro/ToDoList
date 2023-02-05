@@ -7,7 +7,7 @@ import kotlinx.android.parcel.Parcelize
 import java.text.DateFormat
 
 @Entity(tableName = "task_table")
-@Parcelize
+@kotlinx.parcelize.Parcelize
 data class Task(
     val name: String,
     val important: Boolean = false,
