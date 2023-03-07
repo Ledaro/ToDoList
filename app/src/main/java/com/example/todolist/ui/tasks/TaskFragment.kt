@@ -76,7 +76,7 @@ class TaskFragment : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClick
         }
 
         viewModel.tasks.observe(viewLifecycleOwner) {
-            tasksAdapter.submitList()
+            tasksAdapter.submitList(it)
         }
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
